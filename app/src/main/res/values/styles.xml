@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="tinta">#0D0B12</color>
+    <color name="icono_fondo">#16111F</color>
+    <style name="AppTheme" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/tinta</item>
+        <item name="android:statusBarColor">@color/tinta</item>
+        <item name="android:navigationBarColor">@color/tinta</item>
+    </style>
+</resources>
