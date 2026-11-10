@@ -4,7 +4,7 @@
 'use strict';
 
 const Fight = (() => {
-  const W = 360, DUR = 2, EATK = 1.5, ERATE = 0.55;            // ancho lógico de la arena; segundos por unidad de duración de una técnica
+  const W = 360, DUR = 2, EATK = 1.3, ERATE = 0.55;            // ancho lógico de la arena; segundos por unidad de duración de una técnica
   let H = 420, F = null, cv = null, g = null, last = 0, scale = 1, ui = null;
   const hyp = Math.hypot, clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   const dist = (a, b) => hyp(a.x - b.x, a.y - b.y);
@@ -74,7 +74,7 @@ const Fight = (() => {
   function press(k) { if (k === 'dash') dash(); else if (k === 'pill') pill(); else use(+k); }
 
   // ───────────── Acciones del jugador ─────────────
-  const fxNum = (o, text, color) => F.fx.push({ k: 'num', x: o.x + (Math.random() - 0.5) * 18, y: o.y - o.r - 4, t: 0, dur: 0.9, text, color });
+  const fxNum = (o, text, color) => F.fx.push({ k: 'num', x: o.x + (Math.random() - 0.5) * 18, y: o.y - o.r - (/^[-+\d]/.test(text) ? 4 : 22), t: 0, dur: 0.9, text, color });
   function healP(v) { v = Math.round(v); F.p.hp = Math.min(F.d.maxHp, F.p.hp + v); if (v > 0) fxNum(F.p, '+' + v, '#6fd0a0'); }
 
   function hitEnemy(s, first) {
