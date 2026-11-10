@@ -6,19 +6,18 @@ const app = document.getElementById('app');
 const modal = document.getElementById('modal');
 const toastEl = document.getElementById('toast');
 let S = null;      // estado de la partida
-let C = null;      // combate en curso
 let screen = 'title';
 
 const rnd = (a, b) => a + Math.random() * (b - a);
 const esc = t => String(t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const val = v => (typeof v === 'function' ? v() : v);
-const fmt = t => t.replace(/\{n\}/g, esc(S.name)).replace(/\{@\}/g, S.gen);
+const fmt = t => t.replace(/\{n\}/g, esc(S.name)).replace(/\{@\}/g, S.gen).replace(/\{clase\}/g, CLASES[S.cls].n);
 const para = t => fmt(t).split(/\n\n+/).map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
 
 // ───────────── Estado y guardado ─────────────
 function newState() {
   return {
-    name: '', gen: 'o', look: Object.assign({}, LOOK_DEFAULT), origin: 'huerfano', cls: 'espada', evo: [],
+    name: '', gen: 'o', look: Object.assign({}, LOOK_DEFAULT), origin: 'estudiante', cls: 'espada', evo: [],
     lvl: 1, xp: 0, st: { fue: 0, agi: 0, esp: 0, vit: 0 }, karma: { rect: 0, somb: 0, mist: 0 }, lazos: 0, amb: 0,
     flags: {}, pild: 2, node: 'p1', pending: null, lvlups: 0, done: false
   };
@@ -39,7 +38,8 @@ function derive() {
   return {
     maxHp: Math.round(50 + s.vit * 9 + S.lvl * 8), maxQi: Math.round(20 + s.esp * 4 + S.lvl * 2),
     atk: 6 + s[m] * 1.5 + S.lvl * 1.5, def: 2 + s.vit * 0.6 + s.fue * 0.3,
-    crit: Math.min(50, 5 + s.agi * 1.5), dodge: Math.min(25, s.agi)
+    crit: Math.min(50, 5 + s.agi * 1.5), speed: Math.min(190, 112 + s.agi * 3.2),
+    atkInt: Math.max(0.45, 0.95 - s.agi * 0.02), dashCd: Math.max(1, 2.3 - s.agi * 0.06)
   };
 }
 function mySkills() { return CLASES[S.cls].skills.concat(S.evo.map(id => EVOS[id].skill)); }
@@ -101,7 +101,7 @@ function showTitle() {
     <div class="title-moon"></div>
     <div class="title-hanzi">破天經</div>
     <h1>Sutra del<br>Cielo Roto</h1>
-    <p class="subtitle">Una historia de fantasía y murim donde cada decisión forja tu camino</p>
+    <p class="subtitle">Te invocaron a un mundo de magia, caballeros, orcos, elfos y sectas marciales. Cada decisión forja tu camino</p>
     <div class="title-btns">
       ${sv ? `<button class="btn primary" id="bCont">Continuar<small>${esc(sv.name)} · ${esc((sv.evo.length ? EVOS[sv.evo[sv.evo.length - 1]] : CLASES[sv.cls]).n)}</small></button>` : ''}
       <button class="btn ${sv ? '' : 'primary'}" id="bNew">Nueva partida</button>
@@ -118,7 +118,7 @@ function showTitle() {
 const GENS = [['o', 'Él'], ['a', 'Ella'], ['e', 'Elle']];
 function showCreate(step) {
   screen = 'create';
-  const steps = ['Identidad', 'Apariencia', 'Origen', 'Senda marcial'];
+  const steps = ['Identidad', 'Apariencia', 'Tu vida anterior', 'Don de la invocación'];
   let body = '';
   if (step === 0) {
     body = `<label class="field">¿Cómo te llamas?<input id="iName" maxlength="16" placeholder="Tu nombre" value="${esc(S.name)}" autocomplete="off"></label>
@@ -144,7 +144,7 @@ function showCreate(step) {
       return `<button class="card cls ${S.cls === k ? 'on' : ''}" data-cls="${k}"><i class="glyph">${c.glyph}</i><div><b>${c.n}</b><span>${c.d}</span>
         <em>${Object.keys(c.st).map(s => `${STATS[s].n.slice(0, 3)} ${c.st[s]}`).join(' · ')}</em>
         <em>${c.skills.map(s => s.n).join(' · ')}</em></div></button>`;
-    }).join('') + `<p class="hint">Cada senda puede evolucionar dos veces. A qué evolución llegues dependerá de tus decisiones.</p>`;
+    }).join('') + `<p class="hint">Al cruzar entre mundos, algo despierta en ti. Cada don evoluciona dos veces, y a qué evolución llegues dependerá de tus decisiones.</p>`;
   }
   app.innerHTML = `<div class="create">
     <div class="steps">${steps.map((s, i) => `<span class="${i === step ? 'on' : i < step ? 'ok' : ''}">${i + 1}</span>`).join('')}</div>
@@ -205,7 +205,7 @@ function showNode() {
   const text = `<div class="text">${para(val(n.text))}</div>`;
   if (n.fight) {
     frame(n, text + `<div class="choices"><button class="btn danger" id="bGo">⚔ Combatir</button></div>`);
-    document.getElementById('bGo').onclick = startFight;
+    document.getElementById('bGo').onclick = Fight.start;
   } else if (n.evolve) {
     frame(n, text + `<div class="choices"><button class="btn primary" id="bGo">Contemplar tu núcleo</button></div>`);
     document.getElementById('bGo').onclick = () => showEvolve(n);
@@ -277,7 +277,7 @@ function showSheet() {
     <h4>Atributos</h4>
     <div class="grid2">${Object.keys(STATS).map(k => `<span>${STATS[k].n} <b>${S.st[k]}</b></span>`).join('')}
       <span>Vida <b>${d.maxHp}</b></span><span>Qi <b>${d.maxQi}</b></span><span>Ataque <b>${Math.round(d.atk)}</b></span><span>Defensa <b>${Math.round(d.def)}</b></span>
-      <span>Crítico <b>${Math.round(d.crit)}%</b></span><span>Esquiva <b>${Math.round(d.dodge)}%</b></span></div>
+      <span>Crítico <b>${Math.round(d.crit)}%</b></span><span>Velocidad <b>${Math.round(d.speed)}</b></span></div>
     <h4>Tus decisiones</h4>
     ${Object.keys(SENDAS).map(k => meter(SENDAS[k].n, S.karma[k], SENDAS[k].c, 12)).join('')}
     ${Object.keys(VIAS).map(k => meter(VIAS[k].n, S[k], VIAS[k].c, 12)).join('')}
@@ -299,135 +299,6 @@ let toastT = 0;
 function toast(list) {
   toastEl.innerHTML = list.map(g => `<span class="chip" style="--c:${g[1]}">${esc(g[0])}</span>`).join('');
   toastEl.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => { toastEl.hidden = true; }, 2600);
-}
-
-// ───────────── Combate ─────────────
-function startFight() {
-  const n = STORY[S.node], b = ENEMIGOS[n.fight], m = n.mod ? n.mod() : {}, d = derive();
-  const max = Math.round(b.hp * (m.hp || 1));
-  C = {
-    e: { n: b.n, glyph: b.glyph, max, hp: max, atk: b.atk * (m.atk || 1), def: b.def * (m.def || 1), sk: b.sk, dot: null, stun: 0, stunCd: 0, weak: 0, charge: null },
-    p: { hp: d.maxHp, qi: d.maxQi, shield: 0, buff: 0, buffT: 0, evade: 0, guard: false, dot: null },
-    base: b, node: n, log: [[`${b.n} te cierra el paso.`, '']], over: null, pild0: S.pild
-  };
-  renderFight();
-}
-function actions() {
-  const list = [{ kind: 'atk', n: 'Ataque', c: 0, d: 'Golpe básico. Recuperas 4 de Qi.', pow: 1 }];
-  mySkills().forEach(s => list.push(Object.assign({ kind: 'skill' }, s)));
-  list.push({ kind: 'med', n: 'Meditar', c: 0, d: 'Te pones en guardia (mitad de daño) y recuperas Qi.' });
-  list.push({ kind: 'pill', n: `Píldora (${S.pild})`, c: 0, d: 'Recuperas el 45% de tu vida.', off: S.pild < 1 });
-  return list;
-}
-const log = (t, cls) => C.log.push([t, cls || '']);
-function healP(pct, d) { const v = Math.round(d.maxHp * pct); C.p.hp = Math.min(d.maxHp, C.p.hp + v); return v; }
-
-function useSkill(a, d) {
-  if (a.pow) {
-    let total = 0, crits = 0;
-    for (let i = 0; i < (a.hits || 1); i++) {
-      let dm = d.atk * (1 + (C.p.buffT > 0 ? C.p.buff : 0)) * a.pow * rnd(0.9, 1.1) - (a.pierce ? 0 : C.e.def * 0.5);
-      if (Math.random() * 100 < d.crit + (a.crit || 0)) { dm *= 1.6; crits++; }
-      if (a.exec && C.e.hp < C.e.max * 0.4) dm *= 1.8;
-      dm = Math.max(1, Math.round(dm)); C.e.hp -= dm; total += dm;
-    }
-    log(`${a.n}: ${total} de daño${a.hits > 1 ? ` en ${a.hits} golpes` : ''}${crits ? ' — ¡crítico!' : ''}`, 'p');
-    if (a.drain) { const v = Math.round(total * a.drain); C.p.hp = Math.min(d.maxHp, C.p.hp + v); log(`Absorbes ${v} de vida.`, 'good'); }
-  } else log(`Usas ${a.n}.`, 'p');
-  if (a.heal) log(`Recuperas ${healP(a.heal, d)} de vida.`, 'good');
-  if (a.shield) { C.p.shield = Math.min(Math.round(d.maxHp * 0.6), C.p.shield + Math.round(d.maxHp * a.shield)); log(`Escudo de qi: ${C.p.shield}.`, 'good'); }
-  if (a.buff) { C.p.buff = a.buff.a; C.p.buffT = a.buff.t + 1; log(`Tu ataque aumenta un ${Math.round(a.buff.a * 100)}%.`, 'good'); }
-  if (a.evade) { C.p.evade = a.evade + 1; log('Tu silueta se desdibuja.', 'good'); }
-  if (a.weak) { C.e.weak = a.weak; log(`${C.e.n} queda debilitado.`, 'good'); }
-  if (a.dot) { C.e.dot = { d: Math.max(1, Math.round(d.atk * a.dot.p)), t: a.dot.t }; log(`${C.e.n} sufre daño continuo.`, 'good'); }
-  if (a.stun && C.e.hp > 0) {
-    let hit = false; for (let i = 0; i < (a.hits || 1); i++) if (Math.random() < a.stun) hit = true;
-    if (hit && C.e.stunCd <= 0) { C.e.stun = 1; C.e.stunCd = 3; log(`¡${C.e.n} queda aturdido!`, 'good'); }
-  }
-}
-
-function enemyTurn(d) {
-  const e = C.e, p = C.p;
-  if (e.dot) { e.hp -= e.dot.d; log(`${e.n} pierde ${e.dot.d} por el daño continuo.`, 'good'); if (--e.dot.t <= 0) e.dot = null; if (e.hp <= 0) return; }
-  if (e.stun > 0) { e.stun--; log(`${e.n} está aturdido y pierde el turno.`, ''); return; }
-  let s = e.charge;
-  if (s) e.charge = null;
-  else {
-    const tot = e.sk.reduce((a, x) => a + (x.w || 1), 0); let r = Math.random() * tot;
-    s = e.sk.find(x => (r -= (x.w || 1)) < 0) || e.sk[0];
-    if (s.charge) { e.charge = s; log(`⚠ ${e.n} concentra su qi: prepara «${s.n}».`, 'warn'); return; }
-  }
-  if (s.heal) { const v = Math.round(e.max * s.heal); e.hp = Math.min(e.max, e.hp + v); log(`${e.n} usa ${s.n} y recupera ${v}.`, 'e'); }
-  if (!s.pow) return;
-  if (Math.random() * 100 < d.dodge + (p.evade > 0 ? 55 : 0)) { log(`Esquivas ${s.n}.`, 'good'); return; }
-  let dm = e.atk * (e.weak > 0 ? 0.7 : 1) * s.pow * rnd(0.9, 1.1) - d.def * 0.5;
-  if (p.guard) dm *= 0.5;
-  dm = Math.max(1, Math.round(dm));
-  let abs = 0; if (p.shield > 0) { abs = Math.min(p.shield, dm); p.shield -= abs; }
-  p.hp -= dm - abs;
-  log(`${e.n} usa ${s.n}: ${dm - abs} de daño${abs ? ` (el escudo absorbe ${abs})` : ''}${p.guard ? ' — en guardia' : ''}.`, 'e');
-  if (s.dot && dm - abs > 0) { p.dot = { d: s.dot.d, t: s.dot.t }; log('Algo te quema por dentro.', 'e'); }
-  if (s.drain) { const v = Math.round((dm - abs) * s.drain); e.hp = Math.min(e.max, e.hp + v); if (v) log(`${e.n} devora ${v} de tu vida.`, 'e'); }
-}
-
-function act(i) {
-  if (!C || C.over) return;
-  const a = actions()[i], d = derive(), p = C.p;
-  if (!a || a.off || a.c > p.qi) return;
-  C.log = []; p.guard = false; p.qi -= a.c;
-  if (a.kind === 'med') { p.guard = true; const v = Math.round(d.maxQi * 0.35); p.qi = Math.min(d.maxQi, p.qi + v); log(`Meditas en guardia y recuperas ${v} de Qi.`, 'p'); }
-  else if (a.kind === 'pill') { S.pild--; log(`Tragas una píldora: +${healP(0.45, d)} de vida.`, 'good'); }
-  else { useSkill(a, d); if (a.kind === 'atk') p.qi = Math.min(d.maxQi, p.qi + 4); }
-  if (C.e.hp > 0) enemyTurn(d);
-  if (C.e.hp <= 0) return endFight(true);
-  if (p.hp > 0 && p.dot) { p.hp -= p.dot.d; log(`Pierdes ${p.dot.d} por el daño continuo.`, 'e'); if (--p.dot.t <= 0) p.dot = null; }
-  if (p.hp <= 0) return endFight(false);
-  if (C.e.weak > 0) C.e.weak--; if (C.e.stunCd > 0) C.e.stunCd--;
-  if (p.buffT > 0) p.buffT--; if (p.evade > 0) p.evade--;
-  renderFight();
-}
-function endFight(won) {
-  C.over = won ? 'win' : 'lose';
-  if (won) {
-    C.e.hp = 0; C.gains = [];
-    if (C.base.xp) { gainXp(C.base.xp); C.gains.push(['+' + C.base.xp + ' Exp', '#bbb']); }
-    if (C.base.pild) { S.pild += C.base.pild; C.gains.push(['+' + C.base.pild + ' Píldora', '#9be0b0']); }
-    S.node = val(C.node.next); S.pending = null; save();
-  } else { C.p.hp = 0; S.pild = C.pild0; }
-  renderFight();
-}
-
-function renderFight() {
-  screen = 'fight';
-  const d = derive(), e = C.e, p = C.p;
-  const est = [];
-  if (e.charge) est.push('⚠ Concentrando'); if (e.stun) est.push('Aturdido'); if (e.weak) est.push('Debilitado'); if (e.dot) est.push('Daño continuo');
-  const mine = [];
-  if (p.shield) mine.push('Escudo ' + p.shield); if (p.buffT) mine.push('Ataque ↑'); if (p.evade) mine.push('Esquiva ↑'); if (p.dot) mine.push('Quemadura'); if (p.guard) mine.push('En guardia');
-  let foot;
-  if (C.over === 'win') {
-    foot = `<div class="result"><h3>Victoria</h3>${chips(C.gains)}<button class="btn primary" id="bEnd">Continuar</button></div>`;
-  } else if (C.over === 'lose') {
-    foot = `<div class="result"><h3>Has caído</h3><p>El fragmento late en tu pecho y se niega a apagarse. Respiras. Te levantas.</p>
-      <button class="btn primary" id="bEnd">Volver a intentarlo</button></div>`;
-  } else {
-    foot = `<div class="acts">` + actions().map((a, i) =>
-      `<button class="act ${a.kind}" data-a="${i}" ${a.off || a.c > p.qi ? 'disabled' : ''}><b>${a.n}</b>${a.c ? `<i>${a.c} Qi</i>` : ''}<small>${a.d}</small></button>`).join('') + `</div>`;
-  }
-  app.innerHTML = `<div class="fight">
-    <section class="foe ${e.charge ? 'charging' : ''}"><div class="foe-g">${e.glyph}</div><b>${e.n}</b>
-      <div class="bar hp"><i style="width:${Math.max(0, e.hp / e.max * 100)}%"></i><span>${Math.max(0, e.hp)} / ${e.max}</span></div>
-      <div class="est">${est.map(x => `<span>${x}</span>`).join('')}</div></section>
-    <section class="flog">${C.log.map(l => `<p class="${l[1]}">${esc(l[0])}</p>`).join('')}</section>
-    <section class="me"><div class="me-p">${myPortrait()}</div><div class="me-b"><b>${esc(S.name)} <span class="dim">· ${curClass().n}</span></b>
-      <div class="bar hp"><i style="width:${Math.max(0, p.hp / d.maxHp * 100)}%"></i><span>${Math.max(0, p.hp)} / ${d.maxHp}</span></div>
-      <div class="bar qi"><i style="width:${p.qi / d.maxQi * 100}%"></i><span>${p.qi} / ${d.maxQi} Qi</span></div>
-      <div class="est">${mine.map(x => `<span>${x}</span>`).join('')}</div></div></section>
-    ${foot}</div>`;
-  app.querySelectorAll('[data-a]').forEach(b => b.onclick = () => act(+b.dataset.a));
-  const end = document.getElementById('bEnd');
-  if (end) end.onclick = () => { if (C.over === 'win') { C = null; showNode(); } else startFight(); };
-  window.scrollTo(0, 0);
 }
 
 // ───────────── Botón «atrás» de Android ─────────────

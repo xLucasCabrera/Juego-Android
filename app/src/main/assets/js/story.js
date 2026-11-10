@@ -18,36 +18,82 @@ const lista = a => a.length < 2 ? a.join('') : a.slice(0, -1).join(', ') + ' y '
 const STORY = {
   // ───────────── PRÓLOGO ─────────────
   p1: {
-    ch: 'Prólogo', title: 'La Feria de la Niebla', art: 'camino',
-    text: () => `Vado de la Niebla es el último pueblo antes de que el mundo cambie de nombre. Al este, el Camino de Jade se adentra en el Murim: sectas en las cumbres, maestros que parten ríos con una espada, juramentos que duran generaciones. Al oeste, los Reinos: torres de magos, caballeros con grifos en el escudo, dragones dormidos bajo las colinas.
-
-Aquí, en medio, nadie pregunta de dónde vienes.
-
-${{
-      huerfano: 'Tú no vienes de ninguna parte. Creciste en este barro, cargando cubos para la posada, y conoces cada tejado por el que se puede huir.',
-      clan: 'Tú llegaste de niñ{@}, envuelt{@} en una capa quemada, con el sello roto del clan Baek-ri cosido en el forro. Nunca lo has enseñado.',
-      torre: 'Tú llegaste hace dos inviernos, con los dedos manchados de tinta arcana y la costumbre de mirar por encima del hombro. La Torre de Marfil no perdona a quien se marcha.'
+    ch: 'Prólogo', title: 'Una noche cualquiera', art: 'ciudad',
+    text: () => `${{
+      estudiante: 'Son las dos de la madrugada y la biblioteca acaba de echarte. Llevas tres cafés encima, un examen dentro de siete horas y la sensación de que tu vida es una lista de entregas.',
+      repartidor: 'Último pedido de la noche: doce manzanas bajo la lluvia. La aplicación dice que vas tarde. La aplicación siempre dice que vas tarde.',
+      urgencias: 'Sales de una guardia de catorce horas con el olor a desinfectante pegado a la piel. Hoy se salvaron todos menos uno, y es en ese en quien piensas.',
+      gimnasio: 'Las once de la noche. Primero la oficina, después el saco. Llevas los nudillos vendados y trabajas para un jefe que no se sabe tu nombre.'
     }[S.origin]}
 
-Esta noche es la Feria de la Luna de Otoño. Hay farolillos, vino de ciruela y, por una vez, casi parece un buen lugar para vivir.`,
+No eres nadie especial. No hay profecías sobre ti, ni marcas de nacimiento, ni espadas esperándote en ninguna piedra. Tienes un alquiler, un móvil al 3 % de batería y sueño atrasado.
+
+El semáforo del paso de peatones se pone en verde.
+
+Y el asfalto mojado, bajo tus pies, también se enciende: un círculo de caracteres que no has visto nunca gira despacio a tu alrededor. A tu lado, un chaval con auriculares cruza sin ver nada.`,
+    choices: [
+      { t: 'Apartar al chaval de un empujón, por si acaso', eff: { rect: 1 }, go: 'p1b',
+        res: 'El chico trastabilla fuera del círculo y te suelta un insulto. Tú no llegas a oírlo entero.\n\nLa luz sube por tus piernas como agua caliente. El suelo deja de estar ahí.' },
+      { t: 'Agacharte a tocar los símbolos', eff: { mist: 1 }, go: 'p1b',
+        res: 'Están tibios. Y cuando los rozas, uno de ellos se reordena, como si acabara de aprender tu nombre.\n\nLa luz sube por tu brazo. El suelo deja de estar ahí.' },
+      { t: 'Plantarte: sea lo que sea, no piensas echar a correr', eff: { amb: 1 }, go: 'p1b',
+        res: 'Llevas toda la vida apartándote para que pasen otros. Esta vez, no.\n\nLa luz sube por tus piernas como agua caliente. El suelo deja de estar ahí.' }
+    ]
+  },
+  p1b: {
+    ch: 'Prólogo', title: 'El otro lado', art: 'cielo',
+    text: `Caes hacia arriba.
+
+Durante un instante lo ves todo desde fuera: un cielo con una grieta, y por la grieta dos ríos de luz —uno dorado, otro azul— que corren juntos sin llegar a tocarse.
+
+Luego, piedra fría contra la mejilla. Olor a incienso y a lluvia.
+
+Un viejo harapiento baja las manos, temblando de agotamiento.
+
+—Ha funcionado —dice—. Cuarenta años, y ha funcionado.
+
+Habla un idioma que no conoces, y lo entiendes igual.
+
+—Me llamo Mu Cheon. Te he invocado desde el otro lado del cielo, y lo siento. En este mundo, todo el que nace pertenece a uno de los dos ríos: el qi de las sectas marciales del este o el maná de los reinos mágicos del oeste. Yo necesitaba a alguien que no fuera de ninguno.
+
+—¿Puedo volver? —es lo primero que preguntas.
+
+—La puerta por la que has caído está en el cielo. Para abrirla hacen falta tres cosas, y yo solo tengo una. —Señala la salida—. Descansa. Esta noche hay feria. Mira el mundo antes de que te pida nada.`,
+    choices: [{ t: 'Salir a ver dónde has caído', go: 'p1c' }]
+  },
+  p1c: {
+    ch: 'Prólogo', title: 'La Feria de la Niebla', art: 'camino',
+    text: () => `El pueblo se llama Vado de la Niebla y es el último antes de que el mundo cambie de nombre. Al este, el Camino de Jade se adentra en el Murim: sectas en las cumbres y maestros que parten ríos con una espada. Al oeste, los Reinos: torres de magos, caballeros con grifos en el escudo, dragones dormidos bajo las colinas.
+
+Aquí, en medio, se mezcla todo. Una elfa vende copas de cristal que cantan solas. Un orco con delantal de herrero hierra al grifo de un caballero, que le discute el precio. Dos espadachines de túnica blanca caminan por el filo de un tejado como quien pasea. Una maga enciende los farolillos chasqueando los dedos.
+
+Tu ropa atrae miradas. Tu móvil no tiene cobertura y marca un 2 %.
+
+Y hay algo más. Desde que cruzaste, ${{
+      espada: 'cada vez que ves una espada en un puesto, tu mano sabe exactamente cómo empuñarla.',
+      puno: 'sientes el cuerpo denso y firme, como si te hubieran rellenado de hierro.',
+      voz: 'las llamas de los faroles se inclinan hacia ti cuando pasas, como si te reconocieran.',
+      sombra: 'atraviesas el gentío sin que nadie te roce, te mire o te oiga.',
+      jade: 'ves, bajo la piel de la gente, líneas tenues de luz por las que corre algo vivo.'
+    }[S.cls]}`,
     choices: [{ t: 'Perderte entre los puestos', go: 'p2' }]
   },
   p2: {
     ch: 'Prólogo', title: 'El colgante de jade', art: 'camino',
     text: `—¡Ladrón! ¡Rata de alcantarilla!
 
-Un mercader de sedas tiene agarrado por la muñeca a un crío harapiento. Es Tao, el huérfano que duerme bajo el puente. El mercader jura que le ha robado un colgante de jade y exige que alguien llame a la guardia. Aquí, a los ladrones se les corta la mano.
+Un mercader de sedas tiene agarrado por la muñeca a un crío harapiento. Alguien lo llama Tao: el huérfano que duerme bajo el puente. El mercader jura que le ha robado un colgante de jade y exige que venga la guardia. Aquí, por lo visto, a los ladrones se les corta la mano.
 
-Tao te mira. No pide ayuda. Hace mucho que aprendió a no pedirla.`,
+Tao te mira a ti, precisamente a ti, la única persona de la plaza que no es de aquí. No pide ayuda. Hace mucho que aprendió a no pedirla.`,
     choices: [
-      { t: 'Interponerte y pagar el colgante de tu bolsillo', eff: { rect: 1, lazos: 1, flag: 'tao' }, go: 'p3',
-        res: 'Tus ahorros de medio año cambian de mano. El mercader se guarda las monedas con desprecio y suelta al niño.\n\nTao no dice gracias. Te sigue un rato entre el gentío y, antes de desaparecer, te mete algo en la mano: una castaña asada, todavía caliente.' },
+      { t: 'Interponerte y pagar el colgante con tu reloj', eff: { rect: 1, lazos: 1, flag: 'tao' }, go: 'p3',
+        res: 'Tu reloj de pulsera: una máquina diminuta que mide el tiempo sola. El mercader lo acepta con ojos como platos y suelta al niño.\n\nTao no da las gracias. Te sigue un rato entre el gentío y, antes de desaparecer, te mete algo en la mano: una castaña asada, todavía caliente.' },
       { t: 'Observar con calma: algo no encaja en la manga del mercader', eff: { mist: 1, lazos: 1, flag: 'tao' }, go: 'p3',
-        res: 'No miras al niño. Miras al mercader: la manga demasiado rígida, el gesto con que la protege.\n\n—Sacúdala —dices.\n\nEl colgante cae al barro delante de todos. La vieja treta de acusar para cobrar dos veces. El mercader recoge su puesto entre abucheos, y Tao te observa como quien acaba de ver un truco de magia.' },
-      { t: 'Entregar al niño a la guardia y cobrar la recompensa', eff: { somb: 1, amb: 1 }, go: 'p3',
-        res: 'Las monedas pesan lo justo. Mientras se lo llevan, Tao no grita. Solo te mira, memorizando tu cara.\n\nTe dices que así funciona el mundo. Casi te lo crees.' },
-      { t: 'No es asunto tuyo. Seguir caminando', eff: { amb: 1 }, go: 'p3',
-        res: 'Hay cien injusticias al día en la frontera. Si te pararas en cada una, nunca llegarías a ninguna parte.\n\nA tu espalda, el griterío se apaga poco a poco.' }
+        res: 'No miras al niño. Miras al mercader: la manga demasiado rígida, el gesto con que la protege. Has visto ese truco en mil vídeos.\n\n—Sacúdala —dices.\n\nEl colgante cae al barro delante de todos. El mercader recoge su puesto entre abucheos, y Tao te observa como quien acaba de ver magia de verdad.' },
+      { t: 'Sujetar al niño hasta que llegue la guardia y cobrar la recompensa', eff: { somb: 1, amb: 1 }, go: 'p3',
+        res: 'Necesitas dinero de este mundo, y lo necesitas ya. Las monedas pesan lo justo.\n\nMientras se lo llevan, Tao no grita. Solo te mira, memorizando tu cara.' },
+      { t: 'No es tu mundo ni tu problema. Seguir caminando', eff: { amb: 1 }, go: 'p3',
+        res: 'Tú solo quieres volver a casa. Si te paras en cada injusticia de un mundo que no es el tuyo, no llegarás nunca.\n\nA tu espalda, el griterío se apaga poco a poco.' }
     ]
   },
   p3: {
@@ -58,23 +104,25 @@ La luna, redonda y blanca sobre los tejados, se está tiñendo. Primero un borde
 
 La campana del santuario toca una vez y enmudece. Por el Camino de Jade bajan figuras con túnicas carmesí y máscaras sin boca. No gritan. No corren. Simplemente prenden fuego a todo lo que tocan.
 
-—El Culto de la Luna Roja —susurra alguien a tu lado, antes de echar a correr.
+—El Culto de la Luna Roja —susurra el herrero orco a tu lado, antes de echarse a su hija al hombro y correr.
 
-La gente queda atrapada en el almacén de grano. Un enmascarado alto reparte órdenes desde la plaza. Y en el viejo santuario de la colina late una luz azul que no es de este mundo.`,
+Hay gente atrapada en el almacén de grano. Un enmascarado alto reparte órdenes desde la plaza. Y en el santuario de la colina, donde dejaste al viejo, late una luz azul.`,
     choices: [
       { t: 'Sacar a los aldeanos del almacén en llamas', eff: { rect: 2, lazos: 1, flag: 'aldeanos' }, go: 'p4',
-        res: 'Rompes la tranca con el hombro. Sacas a rastras a una anciana, a dos niños, al herrero con la pierna abrasada. Cuando el techo se derrumba, ya no queda nadie dentro.\n\nTienes las manos en carne viva. Alguien grita que el santuario también arde, y allí vive el viejo vagabundo que llegó ayer. Corres.' },
+        res: 'No es tu gente. Da igual. Rompes la tranca con el hombro y sacas a rastras a una anciana, a dos niños, a un caballero con la pierna abrasada. Cuando el techo se derrumba, ya no queda nadie dentro.\n\nTienes las manos en carne viva. El santuario también arde, y allí está el único que sabe cómo devolverte a casa. Corres.' },
       { t: 'Ir a por el comandante enmascarado', eff: { somb: 1, amb: 1 }, go: 'p4',
-        res: 'Coges una hoz de un puesto volcado y cruzas la plaza por las sombras. Corta la cabeza y el cuerpo cae: eso dicen.\n\nEl comandante ni siquiera se gira. Te barre con el dorso de la mano y vuelas diez pasos. Cuando recuperas el aire, él camina ya hacia el santuario, como si allí estuviera lo único que le importa. Lo sigues, cojeando, con la hoz todavía en el puño.' },
-      { t: 'Seguir el resplandor azul del santuario', eff: { mist: 2 }, go: 'p4',
-        res: 'Todos corren en dirección contraria. Tú subes la colina.\n\nLa luz late como un corazón. Cada pulso te eriza la piel, y con cada pulso los enmascarados giran la cabeza hacia ella, como polillas. No han venido por el pueblo. Han venido por eso.' }
+        res: 'Coges una hoz de un puesto volcado y cruzas la plaza por las sombras. Corta la cabeza y el cuerpo cae: eso dicen en tu mundo.\n\nEl comandante ni siquiera se gira. Te barre con el dorso de la mano y vuelas diez pasos. Cuando recuperas el aire, él camina ya hacia el santuario, como si allí estuviera lo único que le importa. Lo sigues, cojeando.' },
+      { t: 'Correr hacia el resplandor azul del santuario', eff: { mist: 2 }, go: 'p4',
+        res: 'Todos corren en dirección contraria. Tú subes la colina.\n\nLa luz late como un corazón, y con cada pulso los enmascarados giran la cabeza hacia ella, como polillas. No han venido por el pueblo. Han venido por lo mismo que te trajo a ti.' }
     ]
   },
   p4: {
     ch: 'Prólogo', title: 'El viejo del santuario', art: 'luna',
-    text: `Dentro del santuario, el vagabundo que ayer mendigaba arroz está de pie entre tres cadáveres con túnica carmesí. Tiene una mano hundida en el pecho, sujetándose una herida que no deja de sangrar, y con la otra sostiene una tablilla de jade que brilla azul.
+    text: `Mu Cheon está de pie entre tres cadáveres con túnica carmesí. Tiene una mano hundida en el costado, sujetándose una herida que no deja de sangrar, y con la otra sostiene una tablilla de jade que brilla azul.
 
-—Vaya —dice al verte, con media sonrisa—. El cielo tiene sentido del humor.
+—Iba a pedírtelo por las buenas —dice con media sonrisa—. El cielo tiene sentido del humor.
+
+Te aprieta la tablilla contra el pecho. El jade se deshace como hielo en agua tibia y se hunde en tu piel. Algo se abre dentro de ti: canales que no sabías que tenías, un río que empieza a correr. Eso que notabas desde que cruzaste despierta de golpe y tiene nombre: {clase}.
 
 Un cuarto acólito entra tras de ti con la daga en alto. El viejo ya no puede levantarse.
 
@@ -83,13 +131,13 @@ Solo quedas tú.`,
   },
   p5: {
     ch: 'Prólogo', title: 'El Sutra del Cielo Roto', art: 'nucleo',
-    text: `El acólito cae. Te tiemblan las manos.
+    text: `El acólito cae. Te tiemblan las manos. Hace una hora estabas esperando un semáforo.
 
-—Me llamo Mu Cheon —dice el viejo—. Hace mucho fui maestro de dos necios. Esto es un fragmento del Sutra del Cielo Roto. Hay tres. Quien los reúna podrá abrir la herida del cielo… o cerrarla.
+—Hace mucho fui maestro de dos necios —dice Mu Cheon—. Lo que llevas dentro es un fragmento del Sutra del Cielo Roto. Hay tres. Quien los reúna podrá abrir la herida del cielo, que es también tu puerta a casa… o cerrarla para siempre.
 
-Aprieta la tablilla contra tu pecho. El jade se deshace como hielo en agua tibia y se hunde en tu piel. Algo se abre dentro de ti: canales que no sabías que tenías, un río que empieza a correr.
+Tose sangre.
 
-—No se lo des a la Alianza. No se lo des al Culto. El segundo fragmento aparecerá en el Torneo del Dragón Durmiente. Y dile a… —tose sangre—. No. Ya lo entenderás.
+—A cualquiera de este mundo, el Sutra lo desgarra: tira de él hacia su río. A ti no. Por eso te traje. No se lo des a la Alianza. No se lo des al Culto. El segundo fragmento aparecerá en el Torneo del Dragón Durmiente.
 
 Le queda un aliento.`,
     choices: [
@@ -98,14 +146,16 @@ Le queda un aliento.`,
       { t: '«¿Qué poder me da esto?»', eff: { amb: 1, xp: 10 }, go: 'c1_1',
         res: 'Se ríe, y la risa lo acaba.\n\n—Todo el que quieras —dice—. Ese es justo el problema.\n\nMuere con los ojos abiertos, mirando la luna roja a través del techo roto.' },
       { t: '«¿Qué es en realidad el Cielo Roto?»', eff: { mist: 1, xp: 10 }, go: 'c1_1',
-        res: '—Buena pregunta. La única buena —susurra—. El qi del Murim y la magia del Oeste… eran un solo río. Alguien lo partió en dos. Ve y mira la grieta con tus propios ojos antes de decidir nada.\n\nMuere con los ojos abiertos, mirando la luna roja a través del techo roto.' }
+        res: '—Buena pregunta. La única buena —susurra—. El qi y la magia eran un solo río. Alguien lo partió en dos. Ve y mira la grieta con tus propios ojos antes de decidir nada.\n\nMuere con los ojos abiertos, mirando la luna roja a través del techo roto.' },
+      { t: '«Yo solo quiero volver a casa.»', eff: { lazos: 1, xp: 10 }, go: 'c1_1',
+        res: '—Lo sé —dice, casi con ternura—. Por eso elegí a alguien corriente y no a un héroe. Los héroes siempre quieren quedarse con el cielo.\n\nMuere con los ojos abiertos, mirando la luna roja a través del techo roto.' }
     ]
   },
 
   // ───────────── CAPÍTULO 1 ─────────────
   c1_1: {
     ch: 'Capítulo 1 · El Camino de Jade', title: 'La Posada del Farol Torcido', art: 'posada',
-    text: () => `Al amanecer, Vado de la Niebla es ceniza y gente que cava tumbas.${F('aldeanos') ? ' La anciana a la que sacaste del almacén te llena el zurrón de tortas de arroz sin decir palabra.' : ''} Entierras a Mu Cheon bajo el ciruelo del santuario y echas a andar hacia el este.
+    text: () => `Al amanecer, Vado de la Niebla es ceniza y gente que cava tumbas.${F('aldeanos') ? ' La anciana a la que sacaste del almacén te llena el zurrón de tortas de arroz sin decir palabra.' : ''} Entierras a Mu Cheon bajo el ciruelo del santuario. No conoces a nadie en este mundo. Tienes un móvil apagado, un fragmento en el pecho y una sola dirección: el este.
 
 Tres días después, en un cruce de caminos, cenas en la Posada del Farol Torcido. El fragmento te arde bajo el esternón cada vez que respiras hondo.
 
@@ -113,9 +163,9 @@ Una joven de túnica blanca, con una espada de vaina nevada a la espalda, va de 
 
 —Tu qi —dice—. Hace tres días no existía, ¿verdad? Soy Lin Xue. Busco a los que quemaron un pueblo en la frontera.`,
     choices: [
-      { t: 'Contarle lo que pasó en la aldea (callando lo del fragmento)', eff: { rect: 1, lazos: 1, flag: 'lin_confia' }, go: 'c1_2',
+      { t: 'Contarle lo que pasó en la aldea (callando lo del fragmento y de dónde vienes)', eff: { rect: 1, lazos: 1, flag: 'lin_confia' }, go: 'c1_2',
         res: 'Se lo cuentas todo, menos lo que llevas en el pecho. Lin Xue escucha sin interrumpir, con los nudillos blancos sobre la mesa.\n\n—La Alianza llegó tarde. Otra vez —dice al fin—. No volverá a pasar. Si vas hacia el este, el camino es más seguro de dos en dos.' },
-      { t: 'Mentir: solo eres alguien que viaja', eff: { somb: 1 }, go: 'c1_2',
+      { t: 'Mentir: solo eres alguien que viaja desde muy lejos', eff: { somb: 1 }, go: 'c1_2',
         res: '—Nadie —dices—. Voy de paso.\n\nLin Xue te sostiene la mirada un segundo de más.\n\n—Los que van de paso no huelen a humo de santuario —responde, y se aleja. Pero no te quita ojo en toda la noche.' },
       { t: 'Responder con otra pregunta: ¿qué busca el Culto?', eff: { mist: 1 }, go: 'c1_2',
         res: '—Preguntas tú primero. Bien —admite, y se sienta—. Buscan tablillas antiguas. Han arrasado cuatro santuarios este año. Mi maestra dice que el Patriarca Ye Mo quiere «abrir el cielo». Nadie sabe qué significa.\n\nTú sí empiezas a saberlo. Te guardas el escalofrío.' }
@@ -145,18 +195,18 @@ En el pasillo se oyen los pasos de Lin Xue, que hace la ronda.`,
     ch: 'Capítulo 1 · El Camino de Jade', title: 'Emboscada en el desfiladero', art: 'camino',
     text: () => `El encapuchado no contrató solo a una ladrona.
 
-Dos días después, en el Desfiladero del Mono Blanco, una docena de bandidos cierra el camino por delante y por detrás. Su jefe, un hombre con un sable ancho como un remo, señala tu pecho con la punta.
+Dos días después, en el Desfiladero del Mono Blanco, una docena de mercenarios cierra el camino por delante y por detrás. Su jefe es un orco de colmillos limados y hombros como vigas: Gorrak. Señala tu pecho con un hacha ancha como un remo.
 
 —Vivo o muerto pagan lo mismo. Tú eliges.
 
-${F('comp_zarza') ? 'Zarza ya ha desaparecido entre las rocas. Un momento después, dos bandidos caen de la cornisa sin un grito. —¡Los de arriba son míos! —oyes.' : 'Lin Xue, que seguía tu mismo camino a cierta distancia, desenvaina y se ocupa de los de retaguardia sin pedir permiso.'}
+${F('comp_zarza') ? 'Zarza ya ha desaparecido entre las rocas. Un momento después, dos mercenarios caen de la cornisa sin un grito. —¡Los de arriba son míos! —oyes.' : 'Lin Xue, que seguía tu mismo camino a cierta distancia, desenvaina y se ocupa de los de retaguardia sin pedir permiso.'}
 
-El jefe es tuyo.`,
+El orco es tuyo.`,
     fight: 'bandido', next: 'c1_4'
   },
   c1_4: {
     ch: 'Capítulo 1 · El Camino de Jade', title: 'Tres caminos', art: 'camino',
-    text: () => `En el cinto del jefe encuentras la carta del encargo. No lleva firma, pero el lacre tiene marcado un sello que Lin Xue reconoce al instante, y palidece.
+    text: () => `En el cinto del orco encuentras la carta del encargo. No lleva firma, pero el lacre tiene marcado un sello que Lin Xue reconoce al instante, y palidece.
 
 —Es un sello de la Alianza Marcial. De alguien del Consejo.
 
@@ -238,7 +288,7 @@ Fuera te espera Lin Xue, con el hatillo ya hecho.
 
 ${F('comp_zarza') ? 'Zarza te guía por pasadizos que no figuran en ningún mapa. —Si alguien sabe quién es tu encapuchado, es la Dama Cuervo. Pero no recibe a nadie que no haya sangrado en el Foso.' : 'Un chiquillo te cobra tres monedas por un consejo: —Quien quiere saber algo, pregunta a la Dama Cuervo. Y la Dama Cuervo solo recibe a quien gana en el Foso.'}
 
-El Foso es un pozo de arena negra rodeado de gradas. El campeón actual se llama Colmillo de Hierro: lleva cuarenta combates sin perder y se limpia los dientes con una astilla de la clavícula del último aspirante.
+El Foso es un pozo de arena negra rodeado de gradas. El campeón actual es un orco de las estepas al que llaman Colmillo de Hierro: lleva cuarenta combates sin perder y se limpia los dientes con una astilla de la clavícula del último aspirante.
 
 Tienes tres noches antes de tu turno.`,
     choices: [
@@ -288,19 +338,20 @@ ${F('comp_zarza') ? 'Zarza te espera en la salida, con las deudas saldadas por p
   // ───────────── CAPÍTULO 2 · TORRE DE MARFIL ─────────────
   t1: {
     ch: 'Capítulo 2 · La Torre de Marfil', title: 'El Espejo del Umbral', art: 'torre',
-    text: () => `La Torre de Marfil se alza en el centro de un lago, rodeada de anillos de piedra que flotan girando despacio. Los magos del Oeste no admiten a «bárbaros del qi».${S.origin === 'torre' ? ' Y a ti menos que a nadie: tu nombre sigue en la lista de desertores.' : ''}
+    text: () => `La Torre de Marfil se alza en el centro de un lago, rodeada de anillos de piedra que flotan girando despacio. Los magos del Oeste no admiten a «bárbaros del qi».
 
 Te cuela por una poterna un aprendiz semielfo de orejas puntiagudas y túnica remendada.
 
-—Kael. Caído en desgracia, a tu servicio —se presenta—. Me expulsan el mes que viene por hacer preguntas. Tú hueles a una respuesta enorme.
+—Kael. Caído en desgracia, a tu servicio —se presenta—. Me expulsan el mes que viene por hacer preguntas. Tú hueles a una respuesta enorme. Y a otro mundo, si la nariz no me engaña.
 
 Para subir hay que cruzar el Espejo del Umbral. Tu reflejo sale del cristal, idéntico a ti, y habla con tu voz:
 
 —¿Qué quieres de verdad?`,
     choices: [
-      { t: '«Que nadie vuelva a arder como ardió mi pueblo.»', eff: { rect: 1, xp: 30 }, go: 't2', res: 'El reflejo asiente despacio.\n\n—Entonces demuéstrame que puedes proteger algo. Empieza por ti.' },
+      { t: '«Que nadie vuelva a arder como ardió aquella aldea.»', eff: { rect: 1, xp: 30 }, go: 't2', res: 'El reflejo asiente despacio.\n\n—Entonces demuéstrame que puedes proteger algo. Empieza por ti.' },
       { t: '«Poder. Suficiente para no volver a temer a nadie.»', eff: { somb: 1, amb: 1, xp: 30 }, go: 't2', res: 'El reflejo sonríe con tu boca.\n\n—Al menos eres sincer{@}. Ven a cogerlo.' },
-      { t: '«Entender qué es lo que llevo dentro.»', eff: { mist: 1, xp: 30 }, go: 't2', res: 'El reflejo ladea la cabeza, curioso.\n\n—Entonces mírame bien. Soy lo primero que tienes que entender.' }
+      { t: '«Entender qué es lo que llevo dentro.»', eff: { mist: 1, xp: 30 }, go: 't2', res: 'El reflejo ladea la cabeza, curioso.\n\n—Entonces mírame bien. Soy lo primero que tienes que entender.' },
+      { t: '«Volver a casa. Nada más.»', eff: { lazos: 1, xp: 30 }, go: 't2', res: 'El reflejo te mira con algo parecido a la pena.\n\n—¿Y si cuando por fin puedas volver ya no quieres? Ven. Vamos a averiguarlo.' }
     ]
   },
   t2: { ch: 'Capítulo 2 · La Torre de Marfil', title: 'Contra ti', art: 'torre',
@@ -346,7 +397,7 @@ Cada decisión que tomaste desde la noche de la Luna Roja está ahí, trazando e
   // ───────────── CAPÍTULO 3 ─────────────
   c3_1: {
     ch: 'Capítulo 3 · El Torneo del Dragón Durmiente', title: 'Longmen, la Puerta del Dragón', art: 'torneo',
-    text: () => `Longmen hierve. Cien sectas, mil estandartes, caballeros del Oeste invitados «en señal de amistad entre los dos mundos». En el palco de honor, vestido de blanco inmaculado, el Gran Maestre Jin Tae-san saluda a la multitud: el hombre más respetado del Murim.
+    text: () => `Longmen hierve. Cien sectas, mil estandartes y, este año, invitados «en señal de amistad»: caballeros del Oeste, arqueros elfos del Bosque de Cristal, campeones de los clanes orcos de la estepa. En el palco de honor, vestido de blanco inmaculado, el Gran Maestre Jin Tae-san saluda a la multitud: el hombre más respetado del Murim.
 
 A su lado, sobre un cojín de seda, la tablilla de jade. El segundo fragmento. El tuyo late al verla.
 
@@ -479,7 +530,7 @@ El núcleo huele a hierro y a lluvia.`,
 
 Luego los huesos se llenan de luz, y la colina abre los ojos.
 
-—Otro portador —dice una voz que hace vibrar el suelo—. Soy Yaoguang. Vi cómo el Primer Emperador partía el cielo para quedarse con el qi y la magia a la vez. Vi cómo el cielo lo partía a él. Guardo el último fragmento desde entonces.${F('pacto') ? '\n\nSus ojos se entornan.\n\n—Hueles a cientos de muertos, criatura.' : ''}
+—Un invocado —dice una voz que hace vibrar el suelo—. Hueles a otro cielo. Soy Yaoguang. Vi cómo el Primer Emperador partía el cielo para quedarse con el qi y la magia a la vez. Vi cómo el cielo lo partía a él. Guardo el último fragmento desde entonces.${F('pacto') ? '\n\nSus ojos se entornan.\n\n—Hueles a cientos de muertos, criatura.' : ''}
 
 La cabeza inmensa desciende hasta quedar frente a ti.
 
@@ -502,7 +553,7 @@ La cabeza inmensa desciende hasta quedar frente a ti.
 
 El tercer fragmento desciende del altar y se hunde en tu pecho. ${F('frag2') ? 'Tres. Estás complet{@}.' : 'Dos de tres. El último lo tienen Jin y Ye Mo.'}
 
-—Escucha lo que tu maestro no tuvo tiempo de decirte —dice Yaoguang—. El Sutra no es un sello ni una llave. Es una pregunta, y quien lo reúne debe responderla en la Cumbre del Cielo Roto: cerrar la herida, quedarse con ella o dejar que los dos ríos vuelvan a ser uno. Mu Cheon lo supo, y tuvo miedo de que sus dos discípulos respondieran mal. Por eso huyó.
+—Escucha lo que el viejo no tuvo tiempo de decirte —dice Yaoguang—. La grieta es la puerta por la que caíste, sí. Pero el Sutra no es un sello ni una llave. Es una pregunta, y quien lo reúne debe responderla en la Cumbre del Cielo Roto: cerrar la herida, quedarse con ella o dejar que los dos ríos vuelvan a ser uno. Mu Cheon lo supo, y tuvo miedo de que sus dos discípulos respondieran mal. Por eso huyó.
 
 ${F('pacto') ? 'El dragón te observa un largo rato.\n\n—No puedo bendecir a quien lleva tantas vidas en el vientre. Pero no te detendré. Hasta los devoradores pueden elegir bien al final.'
         : 'Te roza la frente con el hocico, y algo fresco y antiguo te recorre los meridianos.\n\n—Llevas mi bendición. No te hará más fuerte. Te hará más difícil de torcer.'}
@@ -529,7 +580,7 @@ El ejército carmesí del Culto y los estandartes blancos de los leales a Jin cu
 
 En la cima te esperan dos hombres, espalda con espalda, como debieron de entrenar de niños: Jin Tae-san, de blanco, y Ye Mo, de rojo.
 
-—El portador —dice Ye Mo, casi con afecto—. Llegas a tiempo. ${F('frag2') ? 'Tienes los tres fragmentos. Nosotros, cuarenta años de preparación.' : 'Tú tienes dos fragmentos. Nosotros, uno, y cuarenta años de preparación.'} Entrégalos y verás nacer un mundo nuevo.`,
+—El invocado de nuestro maestro —dice Ye Mo, casi con afecto—. Llegas a tiempo. ${F('frag2') ? 'Tienes los tres fragmentos. Nosotros, cuarenta años de preparación.' : 'Tú tienes dos fragmentos. Nosotros, uno, y cuarenta años de preparación.'} Entrégalos y verás nacer un mundo nuevo.`,
     choices: [
       { t: 'Desenvainar. No habrá mundo nuevo sobre tantos muertos', eff: { rect: 1 }, go: 'c5_jin' },
       { t: 'Decirles las últimas palabras de su maestro', req: () => F('verdad') || S.karma.mist >= 7, reqT: 'Requiere conocer su pasado o Misterio 7', eff: { mist: 2, flag: 'jin_duda' }, go: 'c5_duda' },
@@ -609,38 +660,44 @@ Los fragmentos laten en tu pecho. Su mano sigue extendida. Está confiado: es la
 
 El Sutra del Cielo Roto se abre dentro de ti como un libro. No contiene técnicas. Contiene una sola página, y en ella una sola pregunta.
 
-La grieta desciende hasta rozarte la frente. A un lado ruge el río del qi. Al otro, el río del maná. Los dos tiran de ti.
+La grieta desciende hasta rozarte la frente. A un lado ruge el río del qi. Al otro, el río del maná. Ninguno de los dos consigue arrastrarte: no eres de aquí.
+
+Y al fondo de la grieta, pequeña y nítida, ves una calle mojada, un semáforo en verde, las luces de tu ciudad.
 
 ${hasComp() ? lista(comps()) + (comps().length > 1 ? ' llegan' : ' llega') + ' a la cima, sangrando y en pie.' : 'Estás sol{@} en la cima del mundo.'}
 
 Nadie puede responder por ti.`,
     choices: [
-      { t: 'Cerrar la herida: reforjar el cielo y renunciar al Sutra', go: 'fin_sello' },
-      { t: 'Unir los dos ríos: que el qi y la magia vuelvan a ser uno, para todos', req: () => F('bendicion') || S.karma.mist >= 8, reqT: 'Requiere la bendición del dragón o Misterio 8', go: 'fin_rio' },
-      { t: 'Repartir la carga: sostener el cielo entre todos', req: () => hasComp() && S.lazos >= 8, reqT: 'Requiere compañeros y Lazos 8', go: 'fin_lazos' },
+      { t: 'Cruzar y cerrar la herida desde el otro lado: reparar el cielo y volver a casa', go: 'fin_sello' },
+      { t: 'Unir los dos ríos: que el qi y la magia vuelvan a ser uno, y la puerta quede abierta', req: () => F('bendicion') || S.karma.mist >= 8, reqT: 'Requiere la bendición del dragón o Misterio 8', go: 'fin_rio' },
+      { t: 'Quedarte y repartir la carga: sostener el cielo entre todos', req: () => hasComp() && S.lazos >= 8, reqT: 'Requiere compañeros y Lazos 8', go: 'fin_lazos' },
       { t: 'Beberte la grieta entera: el cielo tendrá un soberano', req: () => F('pacto') || S.amb >= 8, reqT: 'Requiere el Núcleo Demoníaco o Ambición 8', go: 'fin_soberano' }
     ]
   },
 
   // ───────────── FINALES ─────────────
   fin_sello: { ch: 'Final', title: 'El Cielo Reparado', art: 'fin', ending: true,
-    text: `Empujas. No con los brazos: con todo lo que has sido desde aquella noche de feria.
+    text: () => `${hasComp() ? 'Te despides. Es lo más difícil que has hecho en este mundo, y eso que has peleado con un dragón.\n\n' : ''}Das un paso dentro de la grieta, te vuelves y tiras de los bordes. No con los brazos: con todo lo que has sido desde aquella noche de feria.
 
-Los bordes de la grieta se acercan, se tocan, se sueldan con un sonido como de campana lejana. El Sutra arde en tu pecho y se consume. Con él se van tu núcleo, tus meridianos abiertos, el río que corría dentro de ti.
+Los labios de la herida se acercan, se tocan, se sueldan con un sonido de campana lejana. El Sutra arde en tu pecho y se consume. Con él se van tu núcleo, tus meridianos abiertos, el río que corría dentro de ti.
 
-Cuando abres los ojos, el cielo es azul. Solo azul. Y tú eres, otra vez, una persona corriente.
+Lo último que ves de aquel mundo es un cielo azul. Solo azul.
 
-El qi y la magia siguen existiendo, cada uno en su orilla. Pero nadie volverá a abrir el cielo, porque ya no hay llave.
+El semáforo sigue en verde. Llueve. Un chaval con auriculares te esquiva y sigue su camino. Tu móvil marca un 3 %.
 
-Años después, en un pueblo reconstruido junto a un vado, alguien enseña a los niños a esquivar golpes y a mirar bien las mangas de los mercaderes. Dicen que una vez sostuvo el cielo. Tú nunca lo confirmas.` },
+Podría haber sido un sueño, si no fuera porque en el bolsillo, donde nunca hubo nada, hay una tablilla de jade lisa${F('tao') ? ' y una castaña asada, todavía caliente' : ''}.
+
+Cruzas la calle. Mañana tienes cosas que hacer. Pero ya no caminas como antes: caminas como alguien que una vez sostuvo el cielo.` },
   fin_rio: { ch: 'Final', title: 'El Río Único', art: 'fin', ending: true,
     text: `No cierras la grieta. No la bebes. Haces lo que nadie intentó en mil años: te quedas quiet{@} en medio y dejas que los dos ríos pasen a través de ti.
 
 Duele como nacer. El qi y el maná chocan, se enredan, se reconocen. Y entonces dejan de ser dos.
 
-La grieta no se cierra: se deshace, como niebla al sol, porque ya no hay nada que separar.
+La grieta deja de ser una herida y se convierte en un puente: ya no hay nada que separar, ni aquí ni entre los mundos.
 
 Esa primavera, un niño del Murim enciende una vela con una palabra del Oeste. Una maga de la Torre parte una roca con una palma. Los espíritus encadenados se sueltan solos, porque la magia ya no necesita jaulas, y las píldoras hechas con vidas ajenas se vuelven polvo en sus cofres.
+
+Vuelves a casa un martes, a abrazar a quien te daba por desaparecid{@}, y regresas el jueves, porque tienes amigos a los dos lados del cielo.
 
 Hay quien te llama Sabi{@} del Río. Tú prefieres tu nombre: {n}.` },
   fin_lazos: { ch: 'Final', title: 'Los que Sostienen el Cielo', art: 'fin', ending: true,
@@ -648,7 +705,7 @@ Hay quien te llama Sabi{@} del Río. Tú prefieres tu nombre: {n}.` },
 
 ${lista(comps())} ${comps().length > 1 ? 'ponen' : 'pone'} una mano sobre tu hombro. El Sutra, que nació para un solo portador, duda… y se parte. No en tres fragmentos: en tantos como manos hay.
 
-La grieta no desaparece. Se queda ahí, pequeña y vigilada, como una ventana. A un lado y a otro, los dos ríos fluyen con calma, porque por primera vez no hay un solo guardián al que corromper.
+La grieta no desaparece. Se queda ahí, pequeña y vigilada, como una ventana por la que de vez en cuando cruzas a por café de verdad. A un lado y a otro, los dos ríos fluyen con calma, porque por primera vez no hay un solo guardián al que corromper.
 
 Con los años os llaman los Pilares. Fundáis algo que no es secta ni torre ni gremio, donde los ancianos rinden cuentas y los novicios pueden hacer preguntas incómodas.
 
@@ -660,6 +717,8 @@ El río del qi. El río del maná. La grieta entera. El Primer Emperador lo inte
 
 Cuando terminas, no queda herida en el cielo. Está en ti.
 
+Tu calle, tu ciudad, tu nombre de antes: no recuerdas haberlos perdido.
+
 Las sectas se arrodillan. Las torres se arrodillan. Lo que queda del Culto te erige templos, y lo que queda de la Alianza los custodia. Hay paz: la paz perfecta de un mundo con un solo dueño.
 
 ${hasComp() ? 'Quienes caminaron contigo te miran desde abajo, cada año desde un poco más lejos.' : 'No hay nadie a tu lado. Nunca lo hubo, y ahora ya no puede haberlo.'}
@@ -668,7 +727,7 @@ Algunas noches, a solas en el trono de roca negra, te parece oír la risa de un 
   fin_heraldo: { ch: 'Final', title: 'Heraldo de la Luna Roja', art: 'fin', ending: true,
     text: `Los fragmentos abandonan tu pecho uno a uno. Duele menos de lo que esperabas. Lo que duele es el hueco.
 
-Ye Mo se bebe el cielo. La luna queda roja para siempre.
+Ye Mo se bebe el cielo. La luna queda roja para siempre, y la grieta se cierra tras él: tu calle, tu semáforo, tu vida, todo queda al otro lado.
 
 Te da una máscara con boca y un séptimo del mundo. Gobiernas el viejo Murim desde las ruinas de Longmen, y nadie se atreve a mirarte a los ojos. Eres fuerte. Eres temid{@}. Tienes todo lo que pediste aquella noche.
 

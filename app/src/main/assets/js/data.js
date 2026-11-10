@@ -20,26 +20,32 @@ const REINOS = ['Mortal', 'Templado del Cuerpo', 'Reunión de Qi', 'Apertura de 
   'Núcleo Dorado', 'Núcleo Dorado Tardío', 'Alma Naciente', 'Alma Naciente Tardía', 'Unidad con el Cielo', 'Trascendencia'];
 
 const ORIGENES = {
-  huerfano: {
-    n: 'Hija o hijo de la frontera', st: { vit: 2, agi: 1 },
-    d: 'Creciste sin apellido en Vado de la Niebla, cargando agua y esquivando golpes. Nadie te regaló nada.',
-    eff: { lazos: 1 }
+  estudiante: {
+    n: 'Estudiante que no dormía', st: { esp: 2, agi: 1 },
+    d: 'Exámenes, café y apuntes subrayados en tres colores. Aprendes rápido cualquier sistema, aunque sea el de otro mundo.',
+    eff: { mist: 1 }
   },
-  clan: {
-    n: 'Sangre de un clan caído', st: { fue: 2, vit: 1 },
-    d: 'El clan Baek-ri ardió cuando eras pequeño. Solo te queda un sello roto y un nombre que no debes decir.',
+  repartidor: {
+    n: 'Repartidor en bici', st: { agi: 2, vit: 1 },
+    d: 'Lluvia, tráfico y pedidos tarde. Nadie esquiva como quien ha sobrevivido a una avenida en hora punta.',
     eff: { amb: 1 }
   },
-  torre: {
-    n: 'Aprendiz fugitivo de la Torre', st: { esp: 2, agi: 1 },
-    d: 'Huiste de la Torre de Marfil con las manos manchadas de tinta y demasiadas preguntas sin respuesta.',
-    eff: { mist: 1 }
+  urgencias: {
+    n: 'Personal de urgencias', st: { vit: 2, esp: 1 },
+    d: 'Guardias de catorce horas viendo lo peor y lo mejor de la gente. Sabes mantener la calma cuando todos gritan.',
+    eff: { lazos: 1 }
+  },
+  gimnasio: {
+    n: 'Amateur de boxeo', st: { fue: 2, vit: 1 },
+    d: 'Oficina de día, saco de noche. Nunca ganaste nada, pero sabes encajar un golpe y devolverlo.',
+    eff: { rect: 1 }
   }
 };
 
 /* Habilidad: n nombre, c coste de Qi, d descripción y efectos:
    pow (multiplicador), hits, dot{p,t}, stun (prob.), weak (turnos), heal/shield (% vida máx.),
-   buff{a,t}, drain (% del daño), pierce, crit (+%), evade (turnos), exec (remata por debajo del 40%). */
+   buff{a,t}, drain (% del daño), pierce, crit (+%), evade, exec (remata por debajo del 40%).
+   Las duraciones (t, weak, evade) se multiplican por 2 segundos en combate. */
 const sk = (n, c, d, fx) => Object.assign({ n, c, d }, fx);
 
 const CLASES = {
@@ -72,14 +78,14 @@ const CLASES = {
     d: 'Nadie te oye llegar. Frágil, pero letal: críticos devastadores y un paso que nadie alcanza.',
     skills: [
       sk('Puñalada Oculta', 5, 'Golpe con gran probabilidad de crítico.', { pow: 1.4, crit: 35 }),
-      sk('Polvo Cegador', 6, 'Debilita el ataque enemigo durante 3 turnos.', { pow: 0.6, weak: 3 })
+      sk('Polvo Cegador', 6, 'Debilita el ataque enemigo durante 6 s.', { pow: 0.6, weak: 3 })
     ]
   },
   jade: {
     n: 'Mano de Jade', glyph: '藥', main: 'esp', st: { fue: 3, agi: 4, esp: 7, vit: 6 }, grow: ['esp', 'vit'],
     d: 'Agujas, píldoras y venenos. La misma mano que cierra una herida sabe dónde abrirla.',
     skills: [
-      sk('Aguja de Jade', 5, 'Golpea un meridiano y debilita 2 turnos.', { pow: 1.3, weak: 2 }),
+      sk('Aguja de Jade', 5, 'Golpea un meridiano y debilita 4 s.', { pow: 1.3, weak: 2 }),
       sk('Elixir Vital', 7, 'Recuperas el 35% de tu vida.', { heal: 0.35 })
     ]
   }
@@ -109,7 +115,7 @@ evo('e_milhojas', 'e_loto', 2, 'amb', 'Soberanía de las Mil Hojas', 'Una sola e
 evo('e_asura', 'e_carmesi', 2, 'amb', 'Asura de la Hoja Roja', 'Los que te ven desenvainar ya no rezan por ganar: rezan por morir rápido.',
   { fue: 5, agi: 3 }, sk('Mar de Sangre', 20, 'Tajo devastador que te devuelve vida.', { pow: 2.6, drain: 0.4 }), 'pacto');
 evo('e_penitente', 'e_carmesi', 2, 'lazos', 'Filo Penitente', 'Cargas con cada muerte. Alguien te enseñó que el peso también es fuerza.',
-  { fue: 3, vit: 3, esp: 2 }, sk('Golpe de Expiación', 16, 'Castiga y debilita 3 turnos.', { pow: 2.3, weak: 3 }));
+  { fue: 3, vit: 3, esp: 2 }, sk('Golpe de Expiación', 16, 'Castiga y debilita 6 s.', { pow: 2.3, weak: 3 }));
 evo('e_tormenta', 'e_runa', 2, 'lazos', 'Danza de la Tormenta', 'El trueno baila contigo, y nunca bailas a solas.',
   { fue: 3, agi: 3, esp: 2 }, sk('Tempestad Compartida', 18, 'Cuatro relámpagos; cada uno puede aturdir.', { pow: 0.75, hits: 4, stun: 0.2 }));
 evo('e_vacio', 'e_runa', 2, 'amb', 'Filo del Vacío', 'Cortas el espacio entre las cosas. La armadura ya no significa nada.',
@@ -119,9 +125,9 @@ evo('e_vacio', 'e_runa', 2, 'amb', 'Filo del Vacío', 'Cortas el espacio entre l
 evo('p_templo', 'puno', 1, 'rect', 'Guardián del Templo', 'Te plantas entre el débil y el golpe. Siempre.',
   { vit: 3, fue: 2 }, sk('Campana Dorada', 10, 'Tu piel resuena como el bronce: escudo del 40%.', { shield: 0.4 }));
 evo('p_asura', 'puno', 1, 'somb', 'Puño del Asura', 'Has aprendido dónde se rompe un cuerpo. Y te gusta saberlo.',
-  { fue: 4, vit: 1 }, sk('Golpe Quiebra-Meridianos', 10, 'Daña y debilita 3 turnos.', { pow: 1.6, weak: 3 }));
+  { fue: 4, vit: 1 }, sk('Golpe Quiebra-Meridianos', 10, 'Daña y debilita 6 s.', { pow: 1.6, weak: 3 }));
 evo('p_dragon', 'puno', 1, 'mist', 'Cuerpo de Dragón', 'Bajo tu piel asoman escamas de jade. Algo antiguo despierta en tu sangre.',
-  { vit: 2, fue: 2, esp: 1 }, sk('Escamas de Jade', 10, 'Escudo del 30% y más ataque 3 turnos.', { shield: 0.3, buff: { a: 0.25, t: 3 } }));
+  { vit: 2, fue: 2, esp: 1 }, sk('Escamas de Jade', 10, 'Escudo del 30% y más ataque 6 s.', { shield: 0.3, buff: { a: 0.25, t: 3 } }));
 evo('p_montana', 'p_templo', 2, 'lazos', 'Montaña Inamovible', 'Detrás de ti hay gente. Delante, lo que haga falta.',
   { vit: 5, fue: 3 }, sk('Muralla de los Diez Mil', 18, 'Escudo del 50% y curas un 15%.', { shield: 0.5, heal: 0.15 }), 'bendicion');
 evo('p_sereno', 'p_templo', 2, 'amb', 'Puño del Cielo Sereno', 'Un solo golpe, perfecto. No hace falta un segundo.',
@@ -129,7 +135,7 @@ evo('p_sereno', 'p_templo', 2, 'amb', 'Puño del Cielo Sereno', 'Un solo golpe, 
 evo('p_devorador', 'p_asura', 2, 'amb', 'Devorador de Núcleos', 'El qi ajeno sabe mejor que el propio.',
   { fue: 5, vit: 3 }, sk('Festín de Qi', 18, 'Recuperas el 60% del daño infligido.', { pow: 2.2, drain: 0.6 }), 'pacto');
 evo('p_encadenado', 'p_asura', 2, 'lazos', 'Demonio Encadenado', 'La bestia sigue ahí. Tú sostienes la cadena, y otros te ayudan a no soltarla.',
-  { fue: 4, vit: 4 }, sk('Furia Contenida', 16, 'Golpeas y tu ataque sube un 50% durante 3 turnos.', { pow: 1.5, buff: { a: 0.5, t: 3 } }));
+  { fue: 4, vit: 4 }, sk('Furia Contenida', 16, 'Golpeas y tu ataque sube un 50% durante 6 s.', { pow: 1.5, buff: { a: 0.5, t: 3 } }));
 evo('p_anciano', 'p_dragon', 2, 'lazos', 'Corazón del Dragón Anciano', 'El dragón no te posee: te acompaña.',
   { vit: 4, fue: 3, esp: 1 }, sk('Rugido Ancestral', 18, 'Aturde a menudo y debilita.', { pow: 2.0, stun: 0.5, weak: 2 }));
 evo('p_titan', 'p_dragon', 2, 'amb', 'Titán de la Forja Estelar', 'Has templado tus huesos en fuego de estrellas caídas.',
@@ -139,7 +145,7 @@ evo('p_titan', 'p_dragon', 2, 'amb', 'Titán de la Forja Estelar', 'Has templado
 evo('v_alba', 'voz', 1, 'rect', 'Llama del Alba', 'Tu fuego no quema: alumbra.',
   { esp: 3, vit: 2 }, sk('Sol Naciente', 12, 'Daña y te cura un 10%.', { pow: 1.8, heal: 0.1 }));
 evo('v_ceniza', 'voz', 1, 'somb', 'Tejido de Ceniza', 'Aprendiste que el fuego negro no se apaga con agua.',
-  { esp: 4, agi: 1 }, sk('Fuego Negro', 11, 'Una quemadura que consume durante 4 turnos.', { pow: 1.3, dot: { p: 0.5, t: 4 } }));
+  { esp: 4, agi: 1 }, sk('Fuego Negro', 11, 'Una quemadura que consume durante 8 s.', { pow: 1.3, dot: { p: 0.5, t: 4 } }));
 evo('v_marea', 'voz', 1, 'mist', 'Sabiduría de las Mareas', 'Todo fluye. Tú decides hacia dónde.',
   { esp: 3, agi: 1, vit: 1 }, sk('Prisión de Escarcha', 11, 'Suele congelar (aturdir) al enemigo.', { pow: 1.3, stun: 0.5 }));
 evo('v_aurora', 'v_alba', 2, 'lazos', 'Aurora de los Cinco Cielos', 'Cinco colores, cinco elementos, un solo amanecer para todos.',
@@ -147,7 +153,7 @@ evo('v_aurora', 'v_alba', 2, 'lazos', 'Aurora de los Cinco Cielos', 'Cinco color
 evo('v_juicio', 'v_alba', 2, 'amb', 'Juicio Solar', 'Decidiste que la luz también puede dictar sentencia.',
   { esp: 6, vit: 2 }, sk('Veredicto del Mediodía', 22, 'Daño enorme y quemadura.', { pow: 2.8, dot: { p: 0.4, t: 3 } }));
 evo('v_pira', 'v_ceniza', 2, 'amb', 'Pira del Fin', 'Donde pisas no vuelve a crecer nada. Tampoco tus enemigos.',
-  { esp: 7, agi: 1 }, sk('Infierno Carmesí', 22, 'Llamas que devoran durante 4 turnos.', { pow: 2.2, dot: { p: 0.8, t: 4 } }), 'pacto');
+  { esp: 7, agi: 1 }, sk('Infierno Carmesí', 22, 'Llamas que devoran durante 8 s.', { pow: 2.2, dot: { p: 0.8, t: 4 } }), 'pacto');
 evo('v_protege', 'v_ceniza', 2, 'lazos', 'Ceniza que Protege', 'Usas el fuego prohibido como muralla para los tuyos.',
   { esp: 4, vit: 4 }, sk('Muro de Brasas', 16, 'Daña y levanta un escudo del 35%.', { pow: 1.7, shield: 0.35 }));
 evo('v_rio', 'v_marea', 2, 'lazos', 'Río de Estrellas', 'El qi y el maná corren juntos por tus manos.',
@@ -159,9 +165,9 @@ evo('v_ojo', 'v_marea', 2, 'amb', 'Ojo de la Tormenta Arcana', 'En el centro de 
 evo('s_viento', 'sombra', 1, 'rect', 'Viento Justiciero', 'Golpeas desde la oscuridad a quienes la ley no alcanza.',
   { agi: 3, fue: 1, vit: 1 }, sk('Golpe Certero', 10, 'Encuentra el hueco: ignora la defensa.', { pow: 1.7, pierce: true }));
 evo('s_colmillo', 'sombra', 1, 'somb', 'Colmillo de Medianoche', 'El veneno hace el trabajo. Tú solo tienes que rozar.',
-  { agi: 3, fue: 2 }, sk('Veneno de Siete Pasos', 10, 'Veneno feroz durante 4 turnos.', { pow: 1.0, dot: { p: 0.55, t: 4 } }));
+  { agi: 3, fue: 2 }, sk('Veneno de Siete Pasos', 10, 'Veneno feroz durante 8 s.', { pow: 1.0, dot: { p: 0.55, t: 4 } }));
 evo('s_espejismo', 'sombra', 1, 'mist', 'Espejismo Lunar', '¿Cuál de tus reflejos es el verdadero? Ni tú estás ya del todo seguro.',
-  { agi: 3, esp: 2 }, sk('Paso Fantasma', 9, 'Golpeas y te vuelves casi intocable 2 turnos.', { pow: 1.3, evade: 2 }));
+  { agi: 3, esp: 2 }, sk('Paso Fantasma', 9, 'Golpeas y te vuelves casi intocable 4 s.', { pow: 1.3, evade: 2 }));
 evo('s_brisa', 's_viento', 2, 'lazos', 'Brisa que Vela', 'Nadie te ve, pero todos los tuyos duermen tranquilos.',
   { agi: 4, vit: 3, fue: 1 }, sk('Guardia Invisible', 16, 'Golpe preciso y escudo del 25%.', { pow: 2.0, shield: 0.25, pierce: true }), 'bendicion');
 evo('s_relampago', 's_viento', 2, 'amb', 'Relámpago Blanco', 'Para cuando oyen el trueno, ya has envainado.',
@@ -171,7 +177,7 @@ evo('s_segador', 's_colmillo', 2, 'amb', 'Segador sin Rostro', 'Ya no tienes nom
 evo('s_daga', 's_colmillo', 2, 'lazos', 'Daga Arrepentida', 'Sigues matando en silencio, pero ahora eliges por quién.',
   { agi: 4, vit: 2, fue: 2 }, sk('Última Advertencia', 16, 'Debilita y puede aturdir.', { pow: 2.0, weak: 3, stun: 0.3 }));
 evo('s_reflejos', 's_espejismo', 2, 'lazos', 'Luna de Mil Reflejos', 'Cada reflejo lleva el rostro de alguien que confía en ti.',
-  { agi: 4, esp: 2, vit: 2 }, sk('Danza de Reflejos', 18, 'Cuatro golpes y esquiva 2 turnos.', { pow: 0.75, hits: 4, evade: 2 }));
+  { agi: 4, esp: 2, vit: 2 }, sk('Danza de Reflejos', 18, 'Cuatro golpes y esquiva 4 s.', { pow: 0.75, hits: 4, evade: 2 }));
 evo('s_eclipse', 's_espejismo', 2, 'amb', 'Eclipse', 'Cuando actúas, hasta la luna aparta la mirada.',
   { agi: 5, esp: 3 }, sk('Hora sin Luz', 22, 'Golpe brutal; puede aturdir.', { pow: 2.9, stun: 0.4 }));
 
@@ -179,11 +185,11 @@ evo('s_eclipse', 's_espejismo', 2, 'amb', 'Eclipse', 'Cuando actúas, hasta la l
 evo('j_manantial', 'jade', 1, 'rect', 'Manantial Sereno', 'Curas a quien llega, sin preguntar bandera.',
   { esp: 2, vit: 3 }, sk('Lluvia Curativa', 12, 'Curas un 30% y te escudas un 20%.', { heal: 0.3, shield: 0.2 }));
 evo('j_flor', 'jade', 1, 'somb', 'Flor Venenosa', 'Hermosa de lejos. De cerca, lo último que se ve.',
-  { esp: 4, agi: 1 }, sk('Miasma', 10, 'Veneno 4 turnos y debilita 2.', { pow: 0.9, dot: { p: 0.5, t: 4 }, weak: 2 }));
+  { esp: 4, agi: 1 }, sk('Miasma', 10, 'Veneno 8 s y debilita 4 s.', { pow: 0.9, dot: { p: 0.5, t: 4 }, weak: 2 }));
 evo('j_horno', 'jade', 1, 'mist', 'Horno de los Nueve Soles', 'La alquimia es paciencia… hasta que deja de serlo.',
   { esp: 3, vit: 1, agi: 1 }, sk('Píldora Explosiva', 10, 'Estalla y deja ardiendo.', { pow: 1.8, dot: { p: 0.3, t: 3 } }));
 evo('j_loto', 'j_manantial', 2, 'lazos', 'Loto de la Vida Eterna', 'Mientras tú respires, nadie a tu lado caerá.',
-  { esp: 4, vit: 4 }, sk('Florecer', 20, 'Curas un 55% y tu ataque sube 3 turnos.', { heal: 0.55, buff: { a: 0.4, t: 3 } }), 'bendicion');
+  { esp: 4, vit: 4 }, sk('Florecer', 20, 'Curas un 55% y tu ataque sube 6 s.', { heal: 0.55, buff: { a: 0.4, t: 3 } }), 'bendicion');
 evo('j_destino', 'j_manantial', 2, 'amb', 'Mano que Corrige el Destino', 'Si puedes curar la muerte, ¿por qué no reescribir la vida?',
   { esp: 6, vit: 2 }, sk('Aguja del Destino', 20, 'Gran daño y curas un 20%.', { pow: 2.6, heal: 0.2 }));
 evo('j_plaga', 'j_flor', 2, 'amb', 'Plaga Carmesí', 'Un jardín entero de cosas que nadie debería cultivar.',
@@ -193,34 +199,39 @@ evo('j_misericordia', 'j_flor', 2, 'lazos', 'Veneno Misericordioso', 'Duermes al
 evo('j_caldero', 'j_horno', 2, 'lazos', 'Caldero del Dragón', 'Cocinas milagros para una mesa llena.',
   { esp: 4, vit: 3, fue: 1 }, sk('Banquete de los Nueve Soles', 18, 'Daña, cura un 25% y escuda un 20%.', { pow: 1.9, heal: 0.25, shield: 0.2 }));
 evo('j_prohibida', 'j_horno', 2, 'amb', 'Alquimia Prohibida', 'Convertiste tu propio núcleo en horno. No hay vuelta atrás.',
-  { esp: 7, vit: 1 }, sk('Transmutación Final', 22, 'Daño enorme; tu ataque sube 3 turnos.', { pow: 2.8, buff: { a: 0.35, t: 3 } }));
+  { esp: 7, vit: 1 }, sk('Transmutación Final', 22, 'Daño enorme; tu ataque sube 6 s.', { pow: 2.8, buff: { a: 0.35, t: 3 } }));
 
-/* Enemigos. sk: n nombre, pow, w peso, dot{d,t}, charge (avisa y golpea al turno siguiente), heal (%). */
+/* Enemigos (combate en tiempo real). spd velocidad, rate segundos entre ataques, r radio.
+   sk: n nombre, pow, w peso, dot{d,t}, charge (ataque grande, aviso largo), heal (%), drain, n2 (nº de proyectiles)
+   y pat, la forma del ataque: swipe (círculo alrededor), slam (salto sobre ti), dash (embestida en línea),
+   beam (rayo en línea), bolts (proyectiles apuntados), ring (anillo de proyectiles). */
 const ENEMIGOS = {
-  acolito: { n: 'Acólito de la Luna Roja', glyph: '月', hp: 62, atk: 12, def: 3, xp: 30,
-    sk: [{ n: 'Daga ritual', pow: 1 }, { n: 'Tajo frenético', pow: 1.3, w: 0.5 }] },
-  bandido: { n: 'Jefe de bandidos', glyph: '匪', hp: 115, atk: 19, def: 4, xp: 50, pild: 1,
-    sk: [{ n: 'Sablazo', pow: 1 }, { n: 'Patada sucia', pow: 1.2, w: 0.6 }, { n: 'Golpe de sable a dos manos', pow: 1.9, charge: true, w: 0.4 }] },
-  gwak: { n: 'Anciano Gwak', glyph: '老', hp: 190, atk: 25, def: 6, xp: 100,
-    sk: [{ n: 'Palma del Loto Marchito', pow: 1 }, { n: 'Dedo que Sella', pow: 1.25, w: 0.6 }, { n: 'Loto Invertido', pow: 2, charge: true, w: 0.45 }] },
-  acolito_mayor: { n: 'Acólito Mayor', glyph: '月', hp: 180, atk: 26, def: 5, xp: 100,
-    sk: [{ n: 'Hoz carmesí', pow: 1 }, { n: 'Llama de sangre', pow: 1.1, dot: { d: 5, t: 3 }, w: 0.6 }, { n: 'Media luna', pow: 1.9, charge: true, w: 0.4 }] },
-  campeon: { n: 'Colmillo de Hierro, campeón del Foso', glyph: '鬥', hp: 200, atk: 26, def: 6, xp: 100,
-    sk: [{ n: 'Gancho', pow: 1 }, { n: 'Cabezazo', pow: 1.3, w: 0.6 }, { n: 'Abrazo del oso', pow: 2, charge: true, w: 0.45 }] },
-  reflejo: { n: 'Tu Reflejo', glyph: '鏡', hp: 185, atk: 26, def: 5, xp: 100,
-    sk: [{ n: 'Tu propio golpe', pow: 1 }, { n: 'Lo que callas', pow: 1.25, w: 0.6 }, { n: 'Lo que temes', pow: 1.9, charge: true, w: 0.45 }] },
-  aldric: { n: 'Sir Aldric, lanza de los Reinos del Oeste', glyph: '騎', hp: 265, atk: 34, def: 9, xp: 110,
-    sk: [{ n: 'Estocada', pow: 1 }, { n: 'Golpe de escudo', pow: 1.2, w: 0.6 }, { n: 'Carga del grifo', pow: 2, charge: true, w: 0.5 }] },
-  linxue: { n: 'Lin Xue, Nieve del Loto Blanco', glyph: '雪', hp: 310, atk: 38, def: 9, xp: 130,
-    sk: [{ n: 'Corte de escarcha', pow: 1 }, { n: 'Pétalo que cae', pow: 1.3, w: 0.7 }, { n: 'Nieve sobre el Loto', pow: 2.1, charge: true, w: 0.5 }] },
-  heraldo: { n: 'Heraldo de la Luna Roja', glyph: '血', hp: 370, atk: 40, def: 10, xp: 150, pild: 1,
-    sk: [{ n: 'Garra carmesí', pow: 1 }, { n: 'Marea de sangre', pow: 1.1, dot: { d: 8, t: 3 }, w: 0.6 }, { n: 'Eclipse menor', pow: 2.1, charge: true, w: 0.5 }] },
-  emisario: { n: 'Emisario del Patriarca', glyph: '使', hp: 425, atk: 46, def: 11, xp: 160, pild: 1,
-    sk: [{ n: 'Abanico de acero', pow: 1 }, { n: 'Susurro venenoso', pow: 1, dot: { d: 10, t: 3 }, w: 0.6 }, { n: 'Mil agujas rojas', pow: 2.1, charge: true, w: 0.5 }] },
-  dragon: { n: 'Yaoguang, eco del dragón', glyph: '龍', hp: 575, atk: 51, def: 13, xp: 220, pild: 1,
-    sk: [{ n: 'Zarpa de luz', pow: 1 }, { n: 'Coletazo', pow: 1.25, w: 0.6 }, { n: 'Aliento de estrellas', pow: 2.2, charge: true, w: 0.55 }, { n: 'Escamas que se cierran', pow: 0, heal: 0.07, w: 0.25 }] },
-  jin: { n: 'Gran Maestre Jin Tae-san', glyph: '盟', hp: 690, atk: 59, def: 15, xp: 250, pild: 1,
-    sk: [{ n: 'Espada de la Alianza', pow: 1 }, { n: 'Nueve Sellos', pow: 1.3, w: 0.7 }, { n: 'Mandato del Cielo', pow: 2.2, charge: true, w: 0.55 }] },
-  yemo: { n: 'Patriarca Ye Mo', glyph: '魔', hp: 875, atk: 64, def: 16, xp: 0,
-    sk: [{ n: 'Palma de la Luna Roja', pow: 1 }, { n: 'Sangre que arde', pow: 1.1, dot: { d: 14, t: 3 }, w: 0.6 }, { n: 'Cielo Carmesí', pow: 2.3, charge: true, w: 0.55 }, { n: 'Devorar', pow: 0.9, drain: 1, w: 0.35 }] }
+  acolito: { n: 'Acólito de la Luna Roja', glyph: '月', hp: 190, atk: 9, def: 3, xp: 30, spd: 55, rate: 3.4,
+    sk: [{ n: 'Daga ritual', pow: 1 }, { n: 'Embestida frenética', pow: 1.3, w: 0.5, pat: 'dash' }] },
+  bandido: { n: 'Gorrak, mercenario orco', glyph: '獸', hp: 400, atk: 19, def: 4, xp: 50, pild: 1, spd: 58, rate: 1.9,
+    sk: [{ n: 'Hachazo', pow: 1 }, { n: 'Embestida de jabalí', pow: 1.2, w: 0.6, pat: 'dash' }, { n: 'Hacha a dos manos', pow: 1.9, charge: true, w: 0.5, pat: 'swipe' }] },
+  gwak: { n: 'Anciano Gwak', glyph: '老', hp: 660, atk: 25, def: 6, xp: 100, spd: 66,
+    sk: [{ n: 'Palma del Loto Marchito', pow: 1 }, { n: 'Dedo que Sella', pow: 0.8, w: 0.7, pat: 'bolts' }, { n: 'Loto Invertido', pow: 2, charge: true, w: 0.5 }] },
+  acolito_mayor: { n: 'Acólito Mayor', glyph: '月', hp: 630, atk: 26, def: 5, xp: 100, spd: 62,
+    sk: [{ n: 'Hoz carmesí', pow: 1 }, { n: 'Llama de sangre', pow: 0.8, dot: { d: 4, t: 3 }, w: 0.7 }, { n: 'Media luna', pow: 1.9, charge: true, w: 0.5 }] },
+  campeon: { n: 'Colmillo de Hierro, campeón orco del Foso', glyph: '鬥', hp: 700, atk: 26, def: 6, xp: 100, spd: 64, r: 27,
+    sk: [{ n: 'Gancho', pow: 1 }, { n: 'Cabezazo', pow: 1.3, w: 0.7, pat: 'dash' }, { n: 'Abrazo del oso', pow: 2, charge: true, w: 0.5 }] },
+  reflejo: { n: 'Tu Reflejo', glyph: '鏡', hp: 650, atk: 26, def: 5, xp: 100, spd: 80, r: 18,
+    sk: [{ n: 'Tu propio golpe', pow: 1 }, { n: 'Lo que callas', pow: 0.8, w: 0.7, pat: 'bolts' }, { n: 'Lo que temes', pow: 1.9, charge: true, w: 0.5 }] },
+  aldric: { n: 'Sir Aldric, lanza de los Reinos del Oeste', glyph: '騎', hp: 930, atk: 34, def: 9, xp: 110, spd: 66, r: 26,
+    sk: [{ n: 'Estocada', pow: 1 }, { n: 'Golpe de escudo', pow: 1.2, w: 0.6, pat: 'slam' }, { n: 'Carga del grifo', pow: 2, charge: true, w: 0.6, pat: 'dash' }] },
+  linxue: { n: 'Lin Xue, Nieve del Loto Blanco', glyph: '雪', hp: 1080, atk: 38, def: 9, xp: 130, spd: 88, rate: 1.5, r: 20,
+    sk: [{ n: 'Corte de escarcha', pow: 1 }, { n: 'Pétalo que cae', pow: 0.8, w: 0.7, pat: 'bolts' }, { n: 'Paso de nieve', pow: 1.2, w: 0.6, pat: 'dash' }, { n: 'Nieve sobre el Loto', pow: 2.1, charge: true, w: 0.5 }] },
+  heraldo: { n: 'Heraldo de la Luna Roja', glyph: '血', hp: 1300, atk: 40, def: 10, xp: 150, pild: 1, spd: 70, rate: 1.6,
+    sk: [{ n: 'Garra carmesí', pow: 1 }, { n: 'Marea de sangre', pow: 0.75, dot: { d: 5, t: 3 }, w: 0.7, pat: 'ring' }, { n: 'Eclipse menor', pow: 2.1, charge: true, w: 0.5 }] },
+  emisario: { n: 'Emisario del Patriarca', glyph: '使', hp: 1480, atk: 46, def: 11, xp: 160, pild: 1, spd: 76, rate: 1.5, r: 20,
+    sk: [{ n: 'Abanico de acero', pow: 1 }, { n: 'Susurro venenoso', pow: 0.7, dot: { d: 6, t: 3 }, w: 0.7, n2: 5 }, { n: 'Mil agujas rojas', pow: 0.8, w: 0.5, pat: 'ring', n2: 16 }, { n: 'Corte del abanico', pow: 2, charge: true, w: 0.5, pat: 'dash' }] },
+  dragon: { n: 'Yaoguang, eco del dragón', glyph: '龍', hp: 2000, atk: 51, def: 13, xp: 220, pild: 1, spd: 48, rate: 1.6, r: 34,
+    sk: [{ n: 'Zarpa de luz', pow: 1 }, { n: 'Coletazo', pow: 1.5, charge: true, w: 0.5, pat: 'swipe' }, { n: 'Aliento de estrellas', pow: 2.2, charge: true, w: 0.6, pat: 'beam' },
+      { n: 'Lluvia de escamas', pow: 0.7, w: 0.5, pat: 'ring', n2: 14 }, { n: 'Escamas que se cierran', pow: 0, heal: 0.05, w: 0.2 }] },
+  jin: { n: 'Gran Maestre Jin Tae-san', glyph: '盟', hp: 2400, atk: 59, def: 15, xp: 250, pild: 1, spd: 78, rate: 1.4,
+    sk: [{ n: 'Espada de la Alianza', pow: 1 }, { n: 'Nueve Sellos', pow: 0.7, w: 0.7, pat: 'ring', n2: 9 }, { n: 'Paso del Maestre', pow: 1.3, w: 0.6, pat: 'dash' }, { n: 'Mandato del Cielo', pow: 2.2, charge: true, w: 0.55 }] },
+  yemo: { n: 'Patriarca Ye Mo', glyph: '魔', hp: 2900, atk: 62, def: 16, xp: 0, spd: 80, rate: 1.35, r: 26,
+    sk: [{ n: 'Palma de la Luna Roja', pow: 1 }, { n: 'Sangre que arde', pow: 0.7, dot: { d: 8, t: 3 }, w: 0.7, n2: 5 }, { n: 'Devorar', pow: 1, drain: 2, w: 0.5, pat: 'dash' },
+      { n: 'Lluvia carmesí', pow: 0.7, w: 0.5, pat: 'ring', n2: 16 }, { n: 'Cielo Carmesí', pow: 2.3, charge: true, w: 0.55 }] }
 };
